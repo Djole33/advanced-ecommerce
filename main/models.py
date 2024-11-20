@@ -28,6 +28,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     description = models.CharField(max_length=250, default='', blank=True, null=True)
     image = models.ImageField(upload_to='uploads/product/')
+    is_sale = models.BooleanField(default=False)
+    sale_price = models.DecimalField(decimal_places=2, default=0, max_digits=6)
 
     def __str__(self):
         return self.name
