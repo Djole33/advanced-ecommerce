@@ -9,6 +9,16 @@ from .forms import SignUpForm
 def home(request):
     products = Product.objects.all()
     return render(request, 'home.html', {'products': products})
+    
+def category(request, var_name):
+    var_name = var_name.replace('-', ' ')
+    try:
+        category = Category.objects.get(name=var_name)
+        products = Product.objects.filter(category=category)
+        return render(request, 'category.html', {'products': products, 'category': category})
+    except:
+        messages.success(request, ("That category doesn't exist."))
+        return redirect('home')
 
 def product(request, pk):
     single_product = Product.objects.get(id=pk)
