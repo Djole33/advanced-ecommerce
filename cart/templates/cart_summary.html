@@ -9,5 +9,45 @@
             <p class="lead fw-normal text-white-50 mb-0">Overview Of Your Cart</p>
         </div>
     </div>
-</header>BABBAP
+</header>
+
+<div class="container">
+    {% if cart_products %}
+    <br />
+    {% for single_product in cart_products %}
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{ single_product.image.url }}" class="img-fluid rounded-start" alt="...">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <center>
+                        <h5 class="card-title">{{ single_product.name }}</h5> <br />
+                        <p class="card-text justified">{{ single_product.description }}</p>
+                        {% if single_product.is_sale == True %}
+                        <div class="d-flex justify-content-center small text-warning mb-2">
+                            <div class="bi-star-fill"></div>
+                            &nbsp;&nbsp;Sale&nbsp;&nbsp;
+                            <div class="bi-star-fill"></div>
+                        </div>
+                        <strike>${{ single_product.price }}</strike>
+                        ${{ single_product.sale_price }}
+                        <br />
+                        {% else %}
+                        ${{ single_product.price }}
+                        <br /><br />
+                        {% endif %}
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Return</a>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    No Products
+    {% endif %}
+</div>
+
 {% endblock %}

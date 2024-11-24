@@ -27,10 +27,35 @@
                 <br /><br />
                 {% endif %}
                 <a href="{% url 'home' %}" class="btn btn-secondary">Return</a>
+                <button class="btn btn-secondary" type="button" value="{{ single_product.id }}" id="add-cart">Add To Cart</button>
                 </center>
             </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    $(document).on('click', '#add-cart', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "{% url 'cart_add' %}",
+            data: {
+                product_id: $('#add-cart').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
+
+            success: function(json){
+                document.getElementById("cart_quantity").textContent = json.qty
+            },
+
+            error: function(xhr, errmsg, err){
+            },
+        });
+
+    })
+</script>
+
 {% endblock %}
