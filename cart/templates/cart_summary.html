@@ -32,13 +32,34 @@
                             <div class="bi-star-fill"></div>
                         </div>
                         <strike>${{ single_product.price }}</strike>
+                        <br />
                         ${{ single_product.sale_price }}
                         <br />
                         {% else %}
                         ${{ single_product.price }}
-                        <br /><br />
+                        <br />
                         {% endif %}
+                        <br />
+                        <div class="row justify-content-center">
+                            <div class="col-md-2">Quantity:</div>
+                            <div class="col-md-2">
+                                <select class="form-select form-select-sm" id="select{{ single_product.id }}">
+                                    {% for k, v in quantities.items %}
+                                    {% if k == single_product.id|slugify %}
+                                    <option selected>{{ v }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                        </div>
+                        <br />
                         <a href="{% url 'home' %}" class="btn btn-secondary">Return</a>
+                        <button type="button" data-index="{{ single_product.id }}" class="btn btn-secondary update-cart">Update</button>
                     </center>
                 </div>
             </div>
@@ -49,5 +70,30 @@
     No Products
     {% endif %}
 </div>
+
+<script>
+    $(document).on('click', '.update-cart', function(e){
+        e.preventDefault();
+        var productid = $(this).data("index");
+        $.ajax({
+            type: "POST",
+            url: "{% url 'cart_update' %}",
+            data: {
+                product_id: $(this).data('index'),
+                product_qty: $('#select' + productid + ' ' + 'option:selected').text(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
+
+            success: function(json){
+                location.reload();
+            },
+
+            error: function(xhr, errmsg, err){
+            },
+        });
+
+    })
+</script>
 
 {% endblock %}
