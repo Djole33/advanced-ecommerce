@@ -17,7 +17,7 @@ def category(request, var_name):
         products = Product.objects.filter(category=category)
         return render(request, 'category.html', {'products': products, 'category': category})
     except:
-        messages.success(request, ("That category doesn't exist."))
+        messages.info(request, ("That category doesn't exist."))
         return redirect('home')
 
 def product(request, pk):
@@ -39,7 +39,7 @@ def login_user(request):
             return redirect('home')
 
         else:
-            messages.success(request, ('Error logging in!'))
+            messages.error(request, ('Error logging in!'))
             return redirect('login')
     
     else:
@@ -63,8 +63,12 @@ def register_user(request):
             messages.success(request, ('You have been successfully registered!'))
             return redirect('home')
         else:
-            messages.success(request, ('Error registering!'))
+            messages.error(request, ('Error registering!'))
             return redirect('register')
 
     else:
         return render(request, 'register.html', {'form': form})
+    
+def category_summary(request):
+    categories = Category.objects.all()
+    return render(request, 'category_summary.html', {'categories': categories})
