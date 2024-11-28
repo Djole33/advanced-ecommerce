@@ -1,8 +1,9 @@
-from main.models import Product
+from main.models import Product, Profile
 
 class Cart():
     def __init__(self, request):
         self.session = request.session
+        self.request = request
 
         cart = request.session.get('session_key')
 
@@ -19,6 +20,12 @@ class Cart():
             pass
         else:
             self.cart[product_id] = int(product_qty)
+
+        if self.request.user.is_authenticated:
+            current_user = Profile.objects.filter(user__id=self.request.user.id)
+            carty = str(self.cart)
+            carty = carty.replace("\'", "\"")
+            current_user.update(old_cart=carty)
 
         self.session.modified = True
 

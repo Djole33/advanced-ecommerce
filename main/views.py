@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from .models import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, UpdateUserForm, ChangePasswordForm
+from .forms import SignUpForm, UpdateUserForm, ChangePasswordForm, UserInfoForm
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 # Create your views here.
 
@@ -62,7 +63,7 @@ def register_user(request):
             user = authenticate(username=username, password=password)
             login(request, user)
             messages.success(request, ('You have been successfully registered!'))
-            return redirect('home')
+            return redirect('update_info')
         else:
             messages.error(request, ('Error registering!'))
             return redirect('register')
@@ -84,6 +85,20 @@ def update_user(request):
         messages.info(request, ('You need to be logged in first.'))
         return redirect('update_user')
     
+def update_info(request):
+    if request.user.is_authenticated:
+        current_user = Profile.objects.get(user__id=request.user.id)
+        form = UserInfoForm(request.POST or None, instance=current_user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, ('You have successfully changed your info!'))
+            return redirect('home')
+        return render(request, 'update_info.html', {'form': form})
+    else:
+        messages.info(request, ('You need to be logged in first.'))
+        return redirect('update_user')
+    
+
 def update_password(request):
     if request.user.is_authenticated:
         current_user = request.user
@@ -108,3 +123,15 @@ def update_password(request):
 def category_summary(request):
     categories = Category.objects.all()
     return render(request, 'category_summary.html', {'categories': categories})
+
+def search(request):
+    if request.method == "POST":
+        searched = request.POST['searched']
+        searched = Product.objects.filter(Q(name__icontains=searched) | Q(description__icontains=searched))
+        if not searched:
+            messages.info(request, ('That product does not exist.'))
+            return render(request, 'search.html', {})
+        else:
+            return render(request, 'search.html', {'searched': searched})
+    else:
+        return render(request, 'search.html', {})
