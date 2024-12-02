@@ -33,7 +33,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     full_name = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
-    shipping_address = models.CharField(max_length=15000)
+    shipping_address = models.TextField(max_length=15000)
     amout_paid = models.DecimalField(decimal_places=2, max_digits=7)
     date_ordered = models.DateTimeField(auto_now_add=True)
 
