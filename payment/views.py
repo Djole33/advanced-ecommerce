@@ -9,10 +9,23 @@ import datetime
 
 def orders(request, pk):
 	if request.user.is_authenticated and request.user.is_superuser:
-		# Get the order
 		order = Order.objects.get(id=pk)
-		# Get the order items
 		items = OrderItem.objects.filter(order=pk)
+		if request.method == "POST":
+			status = request.POST['shipping_status']
+			if status == 'true':
+				order = Order.objects.filter(id=pk)
+				now = datetime.datetime.now()
+				order.update(shipped=True, date_shipped=now)
+				return redirect('shipped_dash')
+			elif status == 'false':
+				order = Order.objects.filter(id=pk)
+				order.update(shipped=False)
+				return redirect('not_shipped_dash')
+
+			messages.info(request, "Order Shipping Status Updated!")
+
+
 		return render(request, 'payment/orders.html', {"order":order, "items":items})
 	else:
 		messages.success(request, "Access Denied")
@@ -26,11 +39,12 @@ def not_shipped_dash(request):
 		if request.POST:
 			status = request.POST['shipping_status']
 			num = request.POST['num']
+			print(f'AAAAAAAAAAAAAAAAAAAWQWWWWWWWWWWWWWWWWWWWW {num}')
 			order = Order.objects.filter(id=num)
 			now = datetime.datetime.now()
 			order.update(shipped=True, date_shipped=now)
 			messages.success(request, "Shipping Status Updated")
-			return redirect('home')
+			return redirect('shipped_dash')
 
 		return render(request, "payment/not_shipped_dash.html", {"orders":orders})
 	else:
@@ -47,7 +61,7 @@ def shipped_dash(request):
 			now = datetime.datetime.now()
 			order.update(shipped=False)
 			messages.success(request, "Shipping Status Updated")
-			return redirect('home')
+			return redirect('not_shipped_dash')
 
 
 		return render(request, "payment/shipped_dash.html", {"orders":orders})
@@ -124,8 +138,9 @@ def process_order(request):
 			for key in list(request.session.keys()):
 				if key == "session_key":
 					del request.session[key]
-
-
+			
+			current_user = Profile.objects.filter(user__id=request.user.id)
+			current_user.update(old_cart="")
 
 			messages.success(request, "Order Placed!")
 			return redirect('home')

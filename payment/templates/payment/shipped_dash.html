@@ -16,6 +16,7 @@
                             <th scope="col">Price</th>
                             <th scope="col">Customer Email</th>
                             <th scope="col">Date Shipped</th>
+                            <th scope="col">Shipped</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -23,8 +24,16 @@
                         <tr>
                             <td><a href="{% url 'orders' order.id %}">{{ order.id }}</a></td>
                             <td>{{ order.amount_paid }}</td>
-                            <td>@{{ order.email }}</td>
+                            <td>{{ order.email }}</td>
                             <td>{{ order.date_shipped }}</td>
+                            <td>
+                                <form action="" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="shipping_status" value="false" />
+                                    <input type="hidden" name="num" value="{{ order.id }}" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Mark As Unhipped</button>
+                                </form>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
